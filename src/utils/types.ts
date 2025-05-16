@@ -1,4 +1,3 @@
-
 export type ExpenseCategory = 
   | 'FIXED_EXPENSES' 
   | 'TEMPORARY_EXPENSES' 
@@ -52,3 +51,11 @@ export interface SubcategoryData {
   }[];
   total: number;
 }
+
+export type Debt = {
+  id: string;
+  name: string;
+  institution: string;
+  installmentValue: number;
+  totalValue: number;
+};
