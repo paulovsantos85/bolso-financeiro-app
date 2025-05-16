@@ -1,4 +1,3 @@
-
 import { CategoryTotal, ExpenseCategory, ExpenseItem, Income, MonthData, SubcategoryData } from "./types";
 
 export const mockExpenses: ExpenseItem[] = [
@@ -149,6 +148,27 @@ export const getMonthData = (month: number, year: number): MonthData => {
   };
 };
 
+export const getYearData = (year: number): MonthData => {
+  let totalIncome = 0;
+  let totalExpenses = 0;
+  
+  // Filtrar despesas e rendimentos do ano especificado
+  const yearExpenses = mockExpenses.filter(expense => expense.year === year);
+  const yearIncome = mockIncome.filter(income => income.year === year);
+  
+  // Calcular totais
+  totalExpenses = yearExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+  totalIncome = yearIncome.reduce((sum, income) => sum + income.amount, 0);
+  
+  return {
+    month: 0, // 0 representa o ano inteiro
+    year,
+    totalIncome,
+    totalExpenses,
+    balance: totalIncome - totalExpenses,
+  };
+};
+
 export const getCategoryColors = (): Record<ExpenseCategory, string> => {
   return {
     FIXED_EXPENSES: "#3B82F6", // Blue
@@ -197,6 +217,63 @@ export const getCategoryTotals = (
       percentage,
     };
   });
+};
+
+export const getYearCategoryTotals = (year: number): CategoryTotal[] => {
+  const filteredExpenses = mockExpenses.filter(expense => expense.year === year);
+  const totalAmount = filteredExpenses.reduce(
+    (sum, expense) => sum + expense.amount,
+    0
+  );
+
+  const categoryColors = getCategoryColors();
+  
+  const categories: ExpenseCategory[] = [
+    "FIXED_EXPENSES",
+    "TEMPORARY_EXPENSES",
+    "TRANSPORTATION",
+    "EDUCATION",
+    "HEALTH",
+    "LEISURE",
+    "PERSONAL"
+  ];
+
+  return categories.map((category) => {
+    const expenses = filteredExpenses.filter((e) => e.category === category);
+    const total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+    const percentage = totalAmount > 0 ? (total / totalAmount) * 100 : 0;
+
+    return {
+      category,
+      total,
+      color: categoryColors[category],
+      percentage,
+    };
+  });
+};
+
+export const getMonthlyTotals = (year: number) => {
+  const months = Array.from({ length: 12 }, (_, i) => i + 1);
+  
+  return months.map(month => {
+    const monthData = getMonthData(month, year);
+    return {
+      name: getMonthName(month),
+      income: monthData.totalIncome,
+      expenses: monthData.totalExpenses,
+      balance: monthData.balance
+    };
+  });
+};
+
+export const getMonthName = (month: number): string => {
+  const monthNames = [
+    "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
+    "Jul", "Ago", "Set", "Out", "Nov", "Dez"
+  ];
+  
+  // Os meses em JavaScript são baseados em zero (0-11)
+  return monthNames[month - 1] || "";
 };
 
 export const getSubcategoryData = (

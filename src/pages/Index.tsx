@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Dashboard from "@/components/Dashboard";
 import ExpenseList from "@/components/ExpenseList";
@@ -9,6 +10,7 @@ import IncomeForm from "@/components/IncomeForm";
 import { ExpenseCategory, ExpenseItem, Income } from "@/utils/types";
 import { mockExpenses, mockIncome } from "@/utils/mockData";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowRight } from "lucide-react";
 
 const Index = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -63,6 +65,16 @@ const Index = () => {
       <Header currentDate={currentDate} onDateChange={setCurrentDate} />
       
       <main className="container mx-auto p-4 pb-20">
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-2xl font-bold">Dashboard Mensal</h1>
+          <Link 
+            to="/home"
+            className="flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800"
+          >
+            Resumo Anual <ArrowRight size={14} />
+          </Link>
+        </div>
+
         <Tabs defaultValue="dashboard">
           <TabsList className="w-full">
             <TabsTrigger value="dashboard" className="flex-1">Dashboard</TabsTrigger>
