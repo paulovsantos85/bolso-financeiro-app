@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { ExpenseCategory } from "@/utils/types";
 import { getCategoryName } from "@/utils/mockData";
+import { subcategories } from "@/utils/subcategories";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 
@@ -40,11 +41,22 @@ export function ExpenseForm({ month, year, onAddExpense }: ExpenseFormProps) {
   const [category, setCategory] = useState<ExpenseCategory | "">("");
   const [subcategory, setSubcategory] = useState("");
   const [date, setDate] = useState("");
+  const [availableSubcategories, setAvailableSubcategories] = useState<string[]>([]);
+
+  // Update subcategories when category changes
+  useEffect(() => {
+    if (category) {
+      setAvailableSubcategories(subcategories[category]);
+      setSubcategory(""); // Reset subcategory when category changes
+    } else {
+      setAvailableSubcategories([]);
+    }
+  }, [category]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!name || !amount || !category || !date) {
+    if (!name || !amount || !category || !subcategory || !date) {
       toast.error("Preencha todos os campos obrigatórios");
       return;
     }
@@ -52,7 +64,7 @@ export function ExpenseForm({ month, year, onAddExpense }: ExpenseFormProps) {
     onAddExpense({
       name,
       category: category as ExpenseCategory,
-      subcategory: subcategory || "Geral",
+      subcategory,
       amount: parseFloat(amount),
       date,
     });
@@ -151,14 +163,25 @@ export function ExpenseForm({ month, year, onAddExpense }: ExpenseFormProps) {
               htmlFor="subcategory"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              Subcategoria (opcional)
+              Subcategoria
             </label>
-            <Input
-              id="subcategory"
-              placeholder="Ex: Alimentação"
-              value={subcategory}
-              onChange={(e) => setSubcategory(e.target.value)}
-            />
+            <Select 
+              value={subcategory} 
+              onValueChange={setSubcategory} 
+              disabled={!category}
+              required
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={category ? "Selecione uma subcategoria" : "Primeiro selecione uma categoria"} />
+              </SelectTrigger>
+              <SelectContent>
+                {availableSubcategories.map((subcat) => (
+                  <SelectItem key={subcat} value={subcat}>
+                    {subcat}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
